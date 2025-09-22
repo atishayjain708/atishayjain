@@ -60,7 +60,21 @@
   <header class="hero">
     <div class="container center">
       <div class="profile-wrap">
-        <img id="profilePhoto" class="profile-photo" src="/assets/profile-placeholder.png" alt="Portrait of Atishay Jain" loading="eager" decoding="async">
+        <img
+          id="profilePhoto"
+          class="profile-photo"
+          src="/assets/profile-placeholder.png"
+          srcset="/assets/profile-placeholder.png 1x, /assets/profile-placeholder.png 2x"
+          data-default-srcset="/assets/profile-placeholder.png 1x, /assets/profile-placeholder.png 2x"
+          sizes="140px"
+          data-default-sizes="140px"
+          alt="Portrait of Atishay Jain"
+          width="280"
+          height="280"
+          loading="lazy"
+          fetchpriority="high"
+          decoding="async"
+          referrerpolicy="no-referrer">
       </div>
       <h1>Atishay Jain</h1>
       <p class="tagline">TEDx Speaker, Author, Consultant | Founder - Hyperke Growth Partners</p>
@@ -145,11 +159,32 @@
     // Optional: allow setting the hero photo via a query param: ?photo=<PUBLIC_URL>
     (function () {
       try {
+        var img = document.getElementById('profilePhoto');
+        if (!img) return;
+
         var params = new URLSearchParams(window.location.search);
-        var p = params.get('photo');
-        if (p) {
-          var img = document.getElementById('profilePhoto');
-          if (img) img.src = p;
+        var overrideSrc = params.get('photo');
+
+        if (overrideSrc) {
+          img.src = overrideSrc;
+          var overrideSrcset = params.get('photoSet');
+          img.srcset = overrideSrcset ? overrideSrcset : overrideSrc;
+
+          var overrideSizes = params.get('photoSizes');
+          if (overrideSizes) {
+            img.sizes = overrideSizes;
+          } else if (img.dataset.defaultSizes) {
+            img.sizes = img.dataset.defaultSizes;
+          }
+
+          img.removeAttribute('fetchpriority');
+        } else {
+          if (img.dataset.defaultSrcset) {
+            img.srcset = img.dataset.defaultSrcset;
+          }
+          if (img.dataset.defaultSizes) {
+            img.sizes = img.dataset.defaultSizes;
+          }
         }
       } catch(e) {}
     })();
